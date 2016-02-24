@@ -64,15 +64,22 @@ cv_dict[channels_key]= {}
 cv_dict[values_key] = {}
 
 def add_channel(name, value):
+	"""
+	Adds to the channel/value dictionary an alias channel name with channel number.
+	"""
 	cv_dict[channels_key][name] = int(value)
 
 def add_values(name, values):
-	int_values = []
-	for sv in values:
-		int_values.append(int(sv))
+	"""
+	Adds an alias with list of values to the channel/value dictionary.
+	"""
+	int_values = map(int, values)
 	cv_dict[values_key][name] = int_values
 
 def is_valid_channel(channel):
+	"""
+	Determines if a channel number is a valid DMX channel (1-512).
+	"""
 	try:
 		c = int(channel)
 		return (c >= 1) and (c <= 512)
@@ -80,14 +87,18 @@ def is_valid_channel(channel):
 		return False
 
 def are_valid_values(values):
+	"""
+	Determines if a list of values are valid DMX values (0-255).
+	"""
 	try:
-		for value in values:
-			v = int(value)
+		int_values = map(int, values)
+		for v in int_values:
 			if (v >= 0) and (v <= 255):
 				continue
 			else:
 				return False
-	except:
+	except Exception as ex:
+		# print ex
 		return False
 	return True
 
@@ -100,11 +111,15 @@ def load_rc_file():
 	if cf:
 		for line in cf:
 			tokens = line.split()
+			
+			# Blank line
 			if len(tokens) == 0:
 				continue
 
+			# A comment
 			if tokens[0] == '#':
 				continue
+			# A channel alias
 			elif tokens[0] == 'channel':
 				# channel alias value
 				if len(tokens) >= 3:
@@ -116,6 +131,7 @@ def load_rc_file():
 				else:
 					print line
 					print "Invalid channel statement"
+			# A DMX value or values
 			elif tokens[0] in ['value', 'values']:
 				# value alias value
 				if len(tokens) >= 3:
@@ -127,6 +143,7 @@ def load_rc_file():
 				else:
 					print line
 					print "Invalid value statement"
+			# Something we don't recognize
 			else:
 				print line
 				print tokens[0], "is not a recognized configuration file statement"
@@ -134,8 +151,63 @@ def load_rc_file():
 	else:
 		print "Configuration file ~/.uDMXrc was not found"
 
+def translate_message_tokens(message_tokens):
+	"""
+	Translates alias references to their defined values.
+	The first token is a channel alias.
+	The remaining tokens are value aliases.
+	"""
+	trans_tokens = []
+	if message_tokens[0] in cv_dict[channels_key]:
+		trans_tokens.append(cv_dict[channels_key][message_tokens[0]])
+	else:
+		trans_tokens.append(int(message_tokens[0]))
+
+	for token in message_tokens[1:]:
+		if token in cv_dict[values_key]:
+			trans_tokens.extend(cv_dict[values_key][token])
+		else:
+			trans_tokens.append(int(token))
+	
+	return trans_tokens
+
 def dump_dict():
+	"""
+	Diagnostic dump of channel/value dictionary.
+	"""
 	print cv_dict
+
+def find_udmx_device():
+	"""
+	Find the uDMX USB device using its vendor and product ID
+	"""
+	# This is the vendor ID and product ID for the Anyma uDMX clone interface.
+	vid = 0x16c0
+	pid = 0x05dc
+
+	# Find the uDMX interface
+	dev = usb.core.find(idVendor=vid, idProduct=pid)
+
+	if dev is None:
+		print "uDMX device was not found"
+
+	return dev
+
+def send_dmx_message(message_tokens):
+	dev = find_udmx_device()
+	if dev is None:
+		return
+
+	trans_tokens = translate_message_tokens(message_tokens)
+
+	if len(trans_tokens) == 2:
+		# Single value message
+		print "Single value message channel:", trans_tokens[0], "value:", trans_tokens[1]
+	else:
+		# Multi-value message
+		print "Multi-value message channel:", trans_tokens[0], "values:", trans_tokens[1:]
+
+	return
 
 #
 # Main program
@@ -144,9 +216,14 @@ import sys
 if __name__ == "__main__":
 	print "uDMX.py - uDMX utility program"
 
+	# Filter out requests for help
 	if len(sys.argv) == 1 or (sys.argv[1] == "--help" or sys.argv[1] == "-h"):
-		print "Help"
+		print "Help - TBD"
 		exit(0)
 
+	# Load the .uDMXrc file
 	load_rc_file()
-	dump_dict()
+	# dump_dict()
+
+	# Send the message through the uDMX interface
+	send_dmx_message(sys.argv[1:])	
