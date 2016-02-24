@@ -149,41 +149,49 @@ usb request for cmd_SetChannelRange:
         number of bytes read.
 """
 
-# Wow! This actually worked!
+# Wow! This actually works!
 # Single channel value transfer
 bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb.util.CTRL_OUT 
-channel_value = 255
-channel = 2
+channel_value = 255 # on all the way
+channel = 2 # blue channel
 
 # Interface for setting a single channel
 # wValue - the value, 0-255, to be set.
 # wIndex - channel number, 0-511, being set. In DMX terms this corresponds to channel 1-512.
 # data_or_wLength - not used for this case
 
+# Turn light on
 n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
 print "Sent:", n 
 
+print "Sleeping..."
 time.sleep(3.000)
 
+# Turn light off
+channel_value = 0
 n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
 print "Sent:", n 
 
-time.sleep(1.000)
-
-channel_values = bytearray([255, 255, 255])
-channel = 0
-n = dev.ctrl_transfer(bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
-	wIndex=channel, data_or_wLength=channel_values)
-print "Sent:", n 
-
-time.sleep(3.000)
+print "Sleeping..."
+time.sleep(2.000)
 
 # Interface for setting multiple channels at one time
 # wValue - number of channels/bytes to be set. e.g. len(bytearray)
 # wIndex - starting channel number, 0-511.
 # data_or_wLength - sequence type of data, e.g. a bytearray
 
-channel_values = bytearray([0, 0, 0])
+channel_values = bytearray([255, 255, 255]) # RGB all on
+channel = 0 # Red channel
+# Turn on red, green and blue lights
+n = dev.ctrl_transfer(bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
+	wIndex=channel, data_or_wLength=channel_values)
+print "Sent:", n 
+
+print "Sleeping..."
+time.sleep(3.000)
+
+channel_values = bytearray([0, 0, 0]) # all off
+# Turn off red, green and blue
 n = dev.ctrl_transfer(bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
 	wIndex=channel, data_or_wLength=channel_values)
 print "Sent:", n 
