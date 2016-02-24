@@ -12,7 +12,7 @@ programming this interface under Linux.
 Many thanks go out to Markus Baertschi and the work he did on the uDMX-linux utility
 (see https://github.com/markusb/uDMX-linux). His C++ based uDMX utility served as the basis
 for the majority of my learnng exercise. 
-My next project will be a Python version of the uDMX utility.
+My next project will be a Python version of his C++ uDMX utility.
 
 ## License
 
@@ -21,7 +21,7 @@ Free Software Foundation, Inc.. See the LICENSE file for the full text of the li
 
 ## Source Code
 
-The full source is maintained on [GitHub](https://www.github.com/dhocker/repo-tbd).
+The full source is maintained on [GitHub](https://www.github.com/dhocker/uDMX-pyusb).
 
 ## Build Environment
 

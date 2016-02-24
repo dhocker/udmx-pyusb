@@ -149,18 +149,31 @@ usb request for cmd_SetChannelRange:
         number of bytes read.
 """
 
-# Wow! This actually works!
-# Single channel value transfer
+# All data tranfers use this request type. This is more for
+# the PyUSB package than for the uDMX.
 bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb.util.CTRL_OUT 
-channel_value = 255 # on all the way
-channel = 2 # blue channel
 
-# Interface for setting a single channel
+# Single channel value transfer
+# Interface for setting a single channel data value
 # wValue - the value, 0-255, to be set.
 # wIndex - channel number, 0-511, being set. In DMX terms this corresponds to channel 1-512.
-# data_or_wLength - not used for this case
+# data_or_wLength - not used for this case. However, on success this will be the return value.
+
+# Set RGB mode (Venue ThinPar64 is in 7-channel mode)
+channel = 6 # mode channel
+channel_value = 255 # on all the way
+n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
+print "Sent:", n 
+
+# Bring dimmer to 100%
+channel = 7 # dimmer channel
+channel_value = 255 # on all the way
+n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
+print "Sent:", n 
 
 # Turn light on
+channel = 2 # blue channel
+channel_value = 255 # on all the way
 n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
 print "Sent:", n 
 
