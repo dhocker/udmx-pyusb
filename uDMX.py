@@ -15,8 +15,11 @@
 #
 # This utility is based on the C++ uDMX utility written by Markus Baertschi.
 # See https://github.com/markusb/uDMX-linux.git for more on this good work.
-# In particular, this program reads the same format configuration file: ~/.uDMXrc
-# It responds to the same commands.
+# In particular, this program reads the same format rc file: ~/.uDMXrc
+# It responds to the same commands and inputs.
+#
+# This program is limited to controlling one uDMX, namely the first one
+# it finds with the correct vendor ID and product ID.
 #
 
 import json
@@ -70,12 +73,16 @@ if loaded_conf is None:
 try:
     import usb  # this is pyusb
 except:
+    # Assumption: You are running with a virtualenv.
     # If pyusb is not available we assume we might be running sudo on a raspberry pi.
     # In order to directly access a USB port on a raspberry pi, you must be running sudo.
-    # This appears to be the recommended way to activate the venv
-    # when running under sudo. However, it hard wires the venv to this script.
-    # At a minimum we need a runtime test so the work around is only executed
-    # when running on an RPi.
+    # An alternative is the chmod the permissions on the USB device. For example, if the
+    # device is /dev/bus/usb/001/005, then run the command
+    #   sudo chmod +w /dev/bus/usb/001/005
+    # Unfortunately, this change will be lost across a reboot. A more permanent solution
+    # involves digging into udev which is way outside the scope of this project.
+
+    # This appears to be the recommended way to activate the venv specified in the conf file.
     import platform
 
     # If a virtualenv is defined in the config file, use it.
@@ -242,6 +249,8 @@ def find_udmx_device():
 
     if dev is None:
         print "uDMX device was not found"
+
+    # print dev.bus, dev.address
 
     return dev
 
