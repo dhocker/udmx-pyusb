@@ -79,6 +79,9 @@ print dev.manufacturer
 if dev.manufacturer != "www.anyma.ch":
 	print "Error - expected www.anyma.ch, actual " + dev.manufacturer
 
+print "**********PRODUCT"
+print dev.product
+
 dev.set_configuration()
 cfg = dev.get_active_configuration()
 print "**********CONFIGURATION"
