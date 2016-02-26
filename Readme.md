@@ -1,4 +1,4 @@
-# Programming the Anyma uDMX interface (and clones) Using Python
+# Programming the Anyma uDMX interface (and clones) Using Python and PyUSB
 Copyright © 2016 by Dave Hocker (AtHomeX10@gmail.com)
 
 ## Overview
@@ -57,11 +57,11 @@ For each invocation, this program does the following:
     * Locates the uDMX interface.
     * Sends the DMX message defined by the command line arguments.
 
-## Notes
+## Learning Notes
 Here are some notes from this learning exercise.
 
 ### Finding the uDMX Interface
-As there is no kernel driver for the uDMX, it does not show up under /dev.
+As there is no kernel driver for the uDMX, it does not show up under /dev like /dev/tty.
 
 You can locate it this way:
 
@@ -78,6 +78,8 @@ The uDMX is the first device at Bus 001, Device 005 with ID 16c0:05dc. The 16c0 
 the 05dc is the product ID. The uDMX can be found at /dev/bus/usb/001/005.
 
 ## Permissions
+If you want to program the uDMX on a raspberry pi without always running sudo, you
+must do something with the default permissions of the uDMX device. Here are the default permissions.
 
     ~/rpi/uDMX-pyusb $ ls -al /dev/bus/usb/001/005
     crw-rw-r-- 1 root root 189, 4 Feb 25 15:30 /dev/bus/usb/001/005
@@ -100,19 +102,57 @@ rule.
 
     SUBSYSTEM=="usb", ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", MODE="0666"
 
-You can take this solution by copying the 98-uDMX-usb.rules file to /etc/udev/rules.d.
+You can take this solution by editing the [98-uDMX-usb.rules](https://github.com/dhocker/uDMX-pyusb/blob/master/98-uDMX.rules) 
+file and uncommenting
+the line that contains this rule. Copy the edited file to /etc/udev/rules.d.
 
     sudo cp 98-uDMX-usb.rules /etc/udev/rules.d
 
 To make sure the rule is used, pull the uDMX and replug it.
 
+There is an obvious down side to this solution. It gives all users read/write access to the uDMX. We
+can limit read/write access to members of the pi group by changing the rule to:
+
+    SUBSYSTEM=="usb", ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", GROUP="pi"
+
+This rule leaves the permissions set to 664 while changing the ownership to root:pi.
+Overall, this is probably more desirable. The root user owns the device, members of the 
+pi group (which includes pi) have read/write access and all other users have read-only access.
+
+    ~/rpi/uDMX-pyusb $ ll /dev/bus/usb/001/005
+    crw-rw-r-- 1 root pi 189, 4 Feb 26 10:05 /dev/bus/usb/001/005
+
+You can choose this rule by editing 98-uDMX-usb.rules file and uncommenting
+the line that contains this rule.
+
+For more on udev rules see [Writing udev rules](http://www.reactivated.net/writing_udev_rules.html).
+
 ## Reboot Issues
-This is an empiracle observation. On a warm reboot, the uDMX interface is not found. You have to replug
-the device to get Raspbian to find it. Why this happens is unclear.
+This is an empiracle observation. On a warm reboot, the uDMX interface is not always found. 
+You might have to replug the device to get Raspbian to find it. Why this happens is unclear.
 
 ## Multiple uDMX Issues
 It is possible to run multiple uDMX devices on one system, but it can be difficult. Most uDMX interfaces
 and clones do not have unique serial numbers. This makes identification of each interface problematic.
+
+Given the detailed USB information shown below, the following is available to identify
+a uDMX.
+
+* Vendor ID
+* Product ID
+* Manufacturer
+* Product
+* Serial
+* Bus number
+* Device number
+
+Based on limited research it appears that only the Bus and Device numbers uniquely identify a
+given uDMX interace. The other values are likely to be the same for all uDMX interfaces based on the 
+Anyma design and firmware. Unfortunately, the Bus and Device number cannot be used reliably because simply moving 
+a uDMX to another USB port will change one or both of those values.
+
+If you want to use multiple uDMX interfaces, you need to plug them in one at a time and use the lsusb command
+to determine the Bus and Device number for each one. And, after that you can't move them around.
 
 Unless otherwise indicated, the programs in this repo will work with the first uDMX interface they find.
 
@@ -165,3 +205,4 @@ the firmware manufacturer not the hardware manufacturer. The firmware is open so
 1. [uDMX - tiny bus powered USB-DMX interface - Anyma](http://www.anyma.ch/research/udmx/)
 2. [illutzminator](http://www.illutzminator.de/udmx.html?&L=1)
 3. [Markus Baertschi uDMX Utility](https://github.com/markusb/uDMX-linux)
+4. [Writing udev rules](http://www.reactivated.net/writing_udev_rules.html)
