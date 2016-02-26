@@ -1,2 +1,5 @@
 #!/bin/bash
-sudo python uDMX.py $*
+# For raspberry pi systems where the uDMX requires sudo
+# sudo python uDMX.py $*
+# For all other systems where the current user has r/w access to the uDMX
+python uDMX.py $*
