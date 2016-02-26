@@ -11,8 +11,7 @@ programming this interface under Linux (Raspbian Jessie in this case).
 
 Many thanks go out to Markus Baertschi and the work he did on the uDMX-linux utility
 (see https://github.com/markusb/uDMX-linux). His C++ based uDMX utility served as the basis
-for the majority of my learnng exercise. 
-My next project will be a Python version of his C++ uDMX utility.
+for the majority of my learning exercise. 
 
 ## License
 
@@ -34,13 +33,13 @@ The requirements.txt file can be used with pip to create the required virtual en
 ### tryusb.py
 This was my first learning tool. It does the following:
 
-  * Locates the uDMX interface.
-  * Prints some information about the interface.
-  * Sends some basic commands to a Venue ThinPar64 demonstrating how to manipulate the light via DMX.
+* Locates the uDMX interface.
+* Prints some information about the interface.
+* Sends some basic commands to a Venue ThinPar64 demonstrating how to manipulate the light via DMX.
 
 It also helped me resolve some issues with permissions on the RPi. To run this app:
 
-sudo python tryusb.py
+    python tryusb.py
 
 ### uDMX.py
 This program functions pretty much like the C++ based uDMX utility from Markus Baertschi. To get help, try
@@ -51,11 +50,11 @@ This program functions pretty much like the C++ based uDMX utility from Markus B
 
 For each invocation, this program does the following:
 
-    * Loads the uDMX.conf file from /etc/uDMX.conf.
-    * Activates the virtualenv defined in the conf file IF PyUSB is not found in the current environment.
-    * Loads the .uDMXrc file defined in the conf file.
-    * Locates the uDMX interface.
-    * Sends the DMX message defined by the command line arguments.
+* Loads the uDMX.conf file from /etc/uDMX.conf.
+* Activates the virtualenv defined in the conf file IF PyUSB is not found in the current environment.
+* Loads the .uDMXrc file defined in the conf file.
+* Locates the uDMX interface.
+* Sends the DMX message defined by the command line arguments.
 
 ## Learning Notes
 Here are some notes from this learning exercise.
