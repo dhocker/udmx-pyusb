@@ -28,6 +28,9 @@ import json
 loaded_conf = None
 config = {}
 
+# Global options
+verbose = False
+
 def load_conf(cfg_path):
     """
     Try to load the given conf file.
@@ -36,8 +39,9 @@ def load_conf(cfg_path):
     try:
         cfg = open(cfg_path, 'r')
     except Exception as ex:
-        #print "Unable to open {0}".format(cfg_path)
-        #print str(ex)
+        if verbose:
+            print "Unable to open {0}".format(cfg_path)
+            print str(ex)
         return False
       
     # Read the entire contents of the conf file
@@ -327,7 +331,7 @@ def send_dmx_message(message_tokens):
     # Find the uDMX USB device
     dev = find_udmx_device()
     if dev is None:
-        return
+        return False
 
     # Translate the tokens into integers.
     # trans_tokens[0] will be the zero-based channel number (0-511) as an integer.
@@ -336,53 +340,64 @@ def send_dmx_message(message_tokens):
 
     if len(trans_tokens) == 2:
         # Single value message
-        print "Sending single value message channel:", trans_tokens[0], "value:", trans_tokens[1]
+        if verbose:
+            print "Sending single value message channel:", trans_tokens[0], "value:", trans_tokens[1]
         n = send_single_value(dev, trans_tokens[0], trans_tokens[1])
-        print "Sent", n, "value"
+        if verbose:
+            print "Sent", n, "value"
     else:
         # Multi-value message
-        print "Sending multi-value message channel:", trans_tokens[0], "values:", trans_tokens[1:]
+        if verbose:
+            print "Sending multi-value message channel:", trans_tokens[0], "values:", trans_tokens[1:]
         bytes = bytearray(trans_tokens[1:])
         n = send_multi_value(dev, trans_tokens[0], bytes)
-        print "Sent", n, "values"
+        if verbose:
+            print "Sent", n, "values"
 
     # This may not be absolutely necessary, but it is safe.
     # It's the closest thing to a close() method.
     usb.util.dispose_resources(dev)
 
-def help():
-    print ""
-    print "Usage:"
-    print ""
-    #print "python uDMX.py [--help | -h]"
-    #print "or"
-    print "uDMX [--help | -h]"
-    print "    Produces help information"
-    print ""
-    #print "python uDMX.py channel value [value ... value]"
-    #print "or"
-    print "uDMX channel value [value ... value]"
-    print "    Sends DMX message"
-    print "    channel is a number (1-512) or a channel name (defined in ~/.uDMXrc)"
-    print "    value is a number (0-255) or a value name (defined in ~/.uDMXrc)"
-    print ""
-
+    # Returns True if something was sent
+    return n > 0
+    
 #
 # Main program
 #
 import sys
+import argparse
 
 if __name__ == "__main__":
-    print "uDMX.py - uDMX utility program - version 0.9"
+    print "uDMX.py - uDMX utility program - version 0.95"
+
+    # Set up command line parsing
+    parser = argparse.ArgumentParser()
+    parser.add_argument("channel", nargs=1, 
+        help="DMX channel number (1-512) or channel name")
+    parser.add_argument("value", nargs="+", 
+        help="One or more DMX channel values (0-255) or value names")
+    parser.add_argument("-v", "--verbose", 
+        help="Produce verbose output", action="store_true")
+    args = parser.parse_args()
+
+    verbose = args.verbose
 
     # Filter out requests for help and insufficient command line arguments
-    if len(sys.argv) < 2 or (len(sys.argv) == 2 and (sys.argv[1] == "--help" or sys.argv[1] == "-h")):
-        help()
-        exit(0)
+    #if len(sys.argv) < 2 or (len(sys.argv) == 2 and (sys.argv[1] == "--help" or sys.argv[1] == "-h")):
+    #    help()
+    #    exit(0)
 
     # Load the .uDMXrc file
     load_rc_file()
     # dump_dict()
 
     # Send the message through the uDMX interface
-    send_dmx_message(sys.argv[1:])
+    msg_tokens = []
+    msg_tokens.extend(args.channel)
+    msg_tokens.extend(args.value)
+    if verbose:
+        print "Message tokens:", msg_tokens
+    if send_dmx_message(msg_tokens):
+        print "Message sent"
+    else:
+        print "Message failed"
