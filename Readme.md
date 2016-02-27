@@ -127,7 +127,7 @@ the line that contains this rule.
 For more on udev rules see [Writing udev rules](http://www.reactivated.net/writing_udev_rules.html).
 
 ## Reboot Issues
-This is an empiracle observation. On a warm reboot, the uDMX interface is not always found. 
+This is an observation. On a warm reboot, the uDMX interface is not always found. 
 You might have to replug the device to get Raspbian to find it. Why this happens is unclear.
 
 ## Multiple uDMX Issues
