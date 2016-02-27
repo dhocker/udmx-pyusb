@@ -16,6 +16,13 @@
 # This module is based on the C++ uDMX utility written by Markus Baertschi.
 # See https://github.com/markusb/uDMX-linux.git for more on this good work.
 #
+# Usage example
+#
+# dev = pyuDMX.uDMXDevice()
+# dev.open()
+# dev.send_single_value(0, 255) # sends the value 255 to DMX channel 1
+# dev.close()
+#
 
 import usb # the pyusb module is required to be in the current environment
 
@@ -49,12 +56,12 @@ class uDMXDevice:
         """
         Sends a control transfer to the current device.
         :param cmd: 1 for single value transfer, 2 for multi-value transfer
-        :param value_or_length:
-        :param channel: for single value transfer, the value. For multi-value transfer,
+        :param value_or_length: for single value transfer, the value. For multi-value transfer,
             the length of the data bytearray.
+        :param channel: DMX channel number, 1- 512
         :param data_or_length: for a single value transfer it should be 1.
             For a multi-value transfer, a bytearray containing the values.
-        :return:
+        :return: number of bytes sent.
         """
 
         if self._dev is None:
@@ -64,6 +71,21 @@ class uDMXDevice:
         # the PyUSB package than for the uDMX as the uDMX does not
         # use it..
         bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb.util.CTRL_OUT
+
+        """
+        usb request for SetSingleChannel:
+            Request Type:   ignored by device, should be USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT
+            Request:        1
+            Value:          value to set [0 .. 255]
+            Index:          channel index to set [0 .. 511], not the human known value of 1-512
+            Length:         ignored, but returned as the number of byte values transfered
+        usb request for SetMultiChannel:
+            Request Type:   ignored by device, should be USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT
+            Request:        2
+            Value:          number of channels to set [1 .. 512-wIndex]
+            Index:          index of first channel to set [0 .. 511], not the human known value of 1-512
+            Data:           iterable object containing values (we use a bytearray)
+        """
 
         n = self._dev.ctrl_transfer(bmRequestType, cmd, wValue=value_or_length, wIndex=channel - 1,
             data_or_wLength=data_or_length)
@@ -75,12 +97,10 @@ class uDMXDevice:
 
     def send_single_value(self, channel, value):
         """
-        usb request for SetSingleChannel:
-            Request Type:   ignored by device, should be USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT
-            Request:        1
-            Value:          value to set [0 .. 255]
-            Index:          channel index to set [0 .. 511], not the human known value of 1-512
-            Length:         ignored, but returned as the number of byte values transfered
+        Send a single value to the uDMX
+        :param channel: DMX channel number, 1-512
+        :param value: Value to be sent to channel, 0-255
+        :return: number of bytes actually sent
         """
         SetSingleChannel = 1
         n = self._send_control_message(SetSingleChannel, value_or_length=value, channel=channel, data_or_length=1)
@@ -88,12 +108,10 @@ class uDMXDevice:
 
     def send_multi_value(self, channel, values):
         """
-        usb request for SetMultiChannel:
-            Request Type:   ignored by device, should be USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT
-            Request:        2
-            Value:          number of channels to set [1 .. 512-wIndex]
-            Index:          index of first channel to set [0 .. 511]
-            Data:           iterable object containing values (we use a bytearray)
+        Send multiple consecutive bytes to the uDMX
+        :param channel: The starting DMX channel number, 1-512
+        :param values: bytearray of integer values, each value 0-255
+        :return: number of bytes actually sent
         """
         SetMultiChannel = 2
         n = self._send_control_message(SetMultiChannel, value_or_length=len(values),
