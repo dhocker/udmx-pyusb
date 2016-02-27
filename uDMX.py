@@ -104,6 +104,7 @@ except:
         exit(0)
 
 import os
+import pyuDMX
 
 # channel/value dictionary
 channels_key = "channels"
@@ -239,88 +240,6 @@ def dump_dict():
     """
     print cv_dict
 
-
-def find_udmx_device():
-    """
-    Find the uDMX USB device using its vendor and product ID
-    """
-    # This is the vendor ID and product ID for the Anyma uDMX clone interface.
-    vid = 0x16c0
-    pid = 0x05dc
-
-    # Find the uDMX interface
-    dev = usb.core.find(idVendor=vid, idProduct=pid)
-
-    if dev is None:
-        print "uDMX device was not found"
-
-    # print dev.bus, dev.address
-
-    return dev
-
-def send_control_message(dev, cmd, value_or_length=1, channel=1, data_or_length=1):
-    """
-    Execute a control transfer.
-    dev - Device object that defines the target device (uDMX interface).
-    cmd - 1 for single value transfer, 2 for multi-value transfer
-    value_or_length - for single value transfer, the value. For multi-value transfer,
-        the length of the data bytearray.
-    channel - the base DMX channel number, 1-512. Note that this will be adjusted
-        to 0-511 when sent to the uDMX.
-    data_or_length - for a single value transfer it should be 1.
-        For a multi-value transfer, a bytearray containing the values. 
-    """
-
-    # All data tranfers use this request type. This is more for
-    # the PyUSB package than for the uDMX as the uDMX does not 
-    # use it..
-    bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb.util.CTRL_OUT 
-
-    n = dev.ctrl_transfer(bmRequestType, cmd, wValue=value_or_length, wIndex=channel - 1,
-        data_or_wLength=data_or_length)
-    
-    # For a single value transfer the return value is the data_or_length value.
-    # For a multi-value transfer the return value is the number of values transfer
-    # which should be the number of values in the data_or_length bytearray.
-    return n
-
-"""
-    NOTE: 
-    This code implements two functions for transmitting DMX messages. One function 
-    transmits a single channel/value pair while the second transmits a 
-    multi-channel/values set. In reality only the second function is needed as it
-    is a superset of the the first function. The single channel/value function
-    is included here for completeness. The function is used, but is not strictly
-    necessary.
-"""
-
-def send_single_value(dev, channel, value):
-    """
-    usb request for SetSingleChannel:
-        Request Type:   ignored by device, should be USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT
-        Request:        1
-        Value:          value to set [0 .. 255]
-        Index:          channel index to set [0 .. 511], not the human known value of 1-512
-        Length:         ignored, but returned as the number of byte values transfered
-    """
-    SetSingleChannel = 1
-    n = send_control_message(dev, SetSingleChannel, value_or_length=value, channel=channel, data_or_length=1)
-    return n
-
-def send_multi_value(dev, channel, values):
-    """
-    usb request for SetMultiChannel:
-        Request Type:   ignored by device, should be USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT
-        Request:        2
-        Value:          number of channels to set [1 .. 512-wIndex]
-        Index:          index of first channel to set [0 .. 511]
-        Data:           iterable object containing values (we use a bytearray)
-    """
-    SetMultiChannel = 2
-    n = send_control_message(dev, SetMultiChannel, value_or_length=len(values), 
-        channel=channel, data_or_length=values)
-    return n
-
 def send_dmx_message(message_tokens):
     """
     Send the DMX message defined by the command line arguments (message tokens).
@@ -328,9 +247,9 @@ def send_dmx_message(message_tokens):
     The remaining argument(s).token(s) are DMX values.
     """
 
-    # Find the uDMX USB device
-    dev = find_udmx_device()
-    if dev is None:
+    # Open the uDMX USB device
+    dev = pyuDMX.uDMXDevice()
+    if not dev.open():
         return False
 
     # Translate the tokens into integers.
@@ -342,7 +261,7 @@ def send_dmx_message(message_tokens):
         # Single value message
         if verbose:
             print "Sending single value message channel:", trans_tokens[0], "value:", trans_tokens[1]
-        n = send_single_value(dev, trans_tokens[0], trans_tokens[1])
+        n = dev.send_single_value(trans_tokens[0], trans_tokens[1])
         if verbose:
             print "Sent", n, "value"
     else:
@@ -350,13 +269,13 @@ def send_dmx_message(message_tokens):
         if verbose:
             print "Sending multi-value message channel:", trans_tokens[0], "values:", trans_tokens[1:]
         bytes = bytearray(trans_tokens[1:])
-        n = send_multi_value(dev, trans_tokens[0], bytes)
+        n = dev.send_multi_value(trans_tokens[0], bytes)
         if verbose:
             print "Sent", n, "values"
 
     # This may not be absolutely necessary, but it is safe.
     # It's the closest thing to a close() method.
-    usb.util.dispose_resources(dev)
+    dev.close()
 
     # Returns True if something was sent
     return n > 0
@@ -364,7 +283,6 @@ def send_dmx_message(message_tokens):
 #
 # Main program
 #
-import sys
 import argparse
 
 if __name__ == "__main__":

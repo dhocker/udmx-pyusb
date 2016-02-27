@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program (the LICENSE file).  If not, see <http://www.gnu.org/licenses/>.
 #
-# This utility is based on the C++ uDMX utility written by Markus Baertschi.
+# This module is based on the C++ uDMX utility written by Markus Baertschi.
 # See https://github.com/markusb/uDMX-linux.git for more on this good work.
-# In particular, this program reads the same format rc file: ~/.uDMXrc
-# It responds to the same commands and inputs.
 #
 
-import usb
+import usb # the pyusb module is required to be in the current environment
 
 class uDMXDevice:
     def __init__(self):

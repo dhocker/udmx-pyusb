@@ -28,9 +28,9 @@ This work is written in Python 2.7.
 A suitable development environment would use virtualenv and virtualenvwrapper to create a working virtual environment.
 The requirements.txt file can be used with pip to create the required virtual environment with all dependencies.
 
-## Programs
+## Programs and Modules
 
-### tryusb.py
+### tryusb.py Program
 This was my first learning tool. It does the following:
 
 * Locates the uDMX interface.
@@ -41,7 +41,7 @@ It also helped me resolve some issues with permissions on the RPi. To run this a
 
     python tryusb.py
 
-### uDMX.py
+### uDMX.py Program
 This program functions pretty much like the C++ based uDMX utility from Markus Baertschi. To get help, try
 
     ./uDMX --help
@@ -55,6 +55,13 @@ For each invocation, this program does the following:
 * Loads the .uDMXrc file defined in the conf file.
 * Locates the uDMX interface.
 * Sends the DMX message defined by the command line arguments.
+
+uDMX.py uses the pyuDMX.py module.
+
+### pyuDMX.py Module
+The pyuDMX.py module provides a simple, easy to use module for takling to the uDMX interface. Essentially,
+it is a uDMX specific adapter on top of the pyusb module. If you want to write a uDMX oriented application
+consider starting with pyuDMX.py.
 
 ## Learning Notes
 Here are some notes from this learning exercise.
