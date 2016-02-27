@@ -253,7 +253,7 @@ def send_dmx_message(message_tokens):
         return False
 
     # Translate the tokens into integers.
-    # trans_tokens[0] will be the zero-based channel number (0-511) as an integer.
+    # trans_tokens[0] will be the one-based channel number (1-512) as an integer.
     # The remaining tokens will be zero-based values (0-255) as integers.
     trans_tokens = translate_message_tokens(message_tokens)
 
