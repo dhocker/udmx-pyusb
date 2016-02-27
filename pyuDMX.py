@@ -26,29 +26,43 @@ class uDMXDevice:
         self._dev = None
 
     def open(self, vendor_id=0x16c0, product_id=0x5dc):
+        """
+        Open the first device that matches the search criteria
+        :param vendor_id:
+        :param product_id:
+        :return: Returns true if a device was opened. Otherwise, returns false.
+        """
         # Find the uDMX interface
         self._dev = usb.core.find(idVendor=vendor_id, idProduct=product_id)
         return self._dev is not None
 
     def close(self):
+        """
+        Close and release the current usb device.
+        :return: None
+        """
         # This may not be absolutely necessary, but it is safe.
         # It's the closest thing to a close() method.
         if self._dev is not None:
             usb.util.dispose_resources(self._dev)
+            self._dev = None
 
     def _send_control_message(self, cmd, value_or_length=1, channel=1, data_or_length=1):
         """
-        Execute a control transfer.
-        cmd - 1 for single value transfer, 2 for multi-value transfer
-        value_or_length - for single value transfer, the value. For multi-value transfer,
+        Sends a control transfer to the current device.
+        :param cmd: 1 for single value transfer, 2 for multi-value transfer
+        :param value_or_length:
+        :param channel: for single value transfer, the value. For multi-value transfer,
             the length of the data bytearray.
-        channel - the base DMX channel number, 1-512. Note that this will be adjusted
-            to 0-511 when sent to the uDMX.
-        data_or_length - for a single value transfer it should be 1.
+        :param data_or_length: for a single value transfer it should be 1.
             For a multi-value transfer, a bytearray containing the values.
+        :return:
         """
 
-        # All data tranfers use this request type. This is more for
+        if self._dev is None:
+            raise ValueError("No usb device opened")
+
+        # All data transfers use this request type. This is more for
         # the PyUSB package than for the uDMX as the uDMX does not
         # use it..
         bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb.util.CTRL_OUT
