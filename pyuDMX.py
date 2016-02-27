@@ -110,10 +110,15 @@ class uDMXDevice:
         """
         Send multiple consecutive bytes to the uDMX
         :param channel: The starting DMX channel number, 1-512
-        :param values: bytearray of integer values, each value 0-255
+        :param values: any sequence of integer values that can be converted
+        to a bytearray (e.g a list). Each value 0-255.
         :return: number of bytes actually sent
         """
         SetMultiChannel = 2
-        n = self._send_control_message(SetMultiChannel, value_or_length=len(values),
-            channel=channel, data_or_length=values)
+        if isinstance(values, bytearray):
+            ba = values
+        else:
+            ba = bytearray(values)
+        n = self._send_control_message(SetMultiChannel, value_or_length=len(ba),
+            channel=channel, data_or_length=ba)
         return n

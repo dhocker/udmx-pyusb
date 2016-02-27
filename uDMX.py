@@ -268,8 +268,7 @@ def send_dmx_message(message_tokens):
         # Multi-value message
         if verbose:
             print "Sending multi-value message channel:", trans_tokens[0], "values:", trans_tokens[1:]
-        bytes = bytearray(trans_tokens[1:])
-        n = dev.send_multi_value(trans_tokens[0], bytes)
+        n = dev.send_multi_value(trans_tokens[0], trans_tokens[1:])
         if verbose:
             print "Sent", n, "values"
 
