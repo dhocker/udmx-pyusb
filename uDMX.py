@@ -23,6 +23,7 @@
 #
 
 import json
+import os
 
 # The active configuration
 loaded_conf = None
@@ -57,12 +58,17 @@ def load_conf(cfg_path):
         print str(ex)
         return False
 
-    # This config was sucessfully loaded
+    # This config was successfully loaded
     return True
 
 # Try to load the conf file from one of these well known places.
 # If there isn't one, we give up.
-for cfg_path in ["/etc/uDMX.conf", "/home/pi/uDMX.conf", "/home/pi/rpi/uDMX-pyusb/uDMX.conf"]:
+places = ["/etc/uDMX.conf",
+          os.environ["HOME"] + "/uDMX.conf",
+          os.getcwd() + "/uDMX.conf"
+          ]
+
+for cfg_path in places:
     if load_conf(cfg_path):
         loaded_conf = cfg_path
         break
@@ -84,7 +90,8 @@ except:
     # device is /dev/bus/usb/001/005, then run the command
     #   sudo chmod +w /dev/bus/usb/001/005
     # Unfortunately, this change will be lost across a reboot. A more permanent solution
-    # involves digging into udev which is way outside the scope of this project.
+    # involves digging into udev. Permissions and a better solution are discussed in
+    # the Readme.md file.
 
     # This appears to be the recommended way to activate the venv specified in the conf file.
     import platform
@@ -103,7 +110,6 @@ except:
         print "Install PyUSB or specify a virtualenv with PyUSB via the /etc/uDMX.conf file."
         exit(0)
 
-import os
 import pyuDMX
 
 # channel/value dictionary
@@ -168,8 +174,8 @@ def load_rc_file():
         rcfile = config["uDMXrc"]
     else:
         rcfile = os.environ["HOME"] + "/.uDMXrc"
-    cf = open(rcfile, 'r')
-    if cf:
+    try:
+        cf = open(rcfile, 'r')
         for line in cf:
             tokens = line.split()
 
@@ -209,8 +215,8 @@ def load_rc_file():
                 print line
                 print tokens[0], "is not a recognized configuration file statement"
         cf.close()
-    else:
-        print "Configuration file ~/.uDMXrc was not found"
+    except:
+        print "Unable to open configuration file", rcfile
 
 
 def translate_message_tokens(message_tokens):
