@@ -250,6 +250,7 @@ def send_dmx_message(message_tokens):
     # Open the uDMX USB device
     dev = pyuDMX.uDMXDevice()
     if not dev.open():
+        print "Unable to find and open uDMX interface"
         return False
 
     # Translate the tokens into integers.
