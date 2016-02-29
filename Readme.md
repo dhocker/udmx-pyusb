@@ -22,7 +22,7 @@ Free Software Foundation, Inc.. See the LICENSE file for the full text of the li
 
 The full source is maintained on [GitHub](https://www.github.com/dhocker/uDMX-pyusb).
 
-## Build Environment
+## Development Environment
 
 This work is written in Python 2.7.
 A suitable development environment would use virtualenv and virtualenvwrapper to create a working virtual environment.
@@ -37,7 +37,7 @@ This was my first learning tool. It does the following:
 * Prints some information about the interface.
 * Sends some basic commands to a Venue ThinPar64 demonstrating how to manipulate the light via DMX.
 
-It also helped me resolve some issues with permissions on the RPi. To run this app:
+It also helped me resolve some issues with [permissions](#Permissions) on the RPi. To run this app:
 
     python tryusb.py
 
@@ -59,9 +59,16 @@ For each invocation, this program does the following:
 uDMX.py uses the pyuDMX.py module.
 
 ### pyuDMX.py Module
-The pyuDMX.py module provides a simple, easy to use module for takling to the uDMX interface. Essentially,
+The pyuDMX.py module provides a simple, easy to use module for talking to the uDMX interface. Essentially,
 it is a uDMX specific adapter on top of the pyusb module. If you want to write a uDMX oriented application
 consider starting with pyuDMX.py.
+
+Simple usage example:
+
+    dev = pyuDMX.uDMXDevice()
+    dev.open()
+    dev.send_single_value(0, 255) # sends the value 255 to DMX channel 1
+    dev.close()
 
 ## Learning Notes
 Here are some notes from this learning exercise.
@@ -83,14 +90,14 @@ You can locate it this way:
 The uDMX is the first device at Bus 001, Device 005 with ID 16c0:05dc. The 16c0 is the vendor ID and
 the 05dc is the product ID. The uDMX can be found at /dev/bus/usb/001/005.
 
-## Permissions
+## Permissions <a id="Permissions"></a>
 If you want to program the uDMX on a raspberry pi without always running sudo, you
-must do something with the default permissions of the uDMX device. Here are the default permissions.
+must do something with the default permissions of the uDMX device.
 
     ~/rpi/uDMX-pyusb $ ls -al /dev/bus/usb/001/005
     crw-rw-r-- 1 root root 189, 4 Feb 25 15:30 /dev/bus/usb/001/005
 
-Notice the permissions for the device: 664. Only root and members of the 
+Notice the permissions are: 664. Only root and members of the 
 root group have write permission. This is why sudo is required for the current user (usually pi).
 You can fix this issue by changing the permissions on the uDMX to: 666.
 
@@ -109,8 +116,7 @@ rule.
     SUBSYSTEM=="usb", ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", MODE="0666"
 
 You can take this solution by editing the [98-uDMX-usb.rules](https://github.com/dhocker/uDMX-pyusb/blob/master/98-uDMX.rules) 
-file and uncommenting
-the line that contains this rule. Copy the edited file to /etc/udev/rules.d.
+file and uncommenting the line that contains this rule. Copy the edited file to /etc/udev/rules.d.
 
     sudo cp 98-uDMX-usb.rules /etc/udev/rules.d
 
