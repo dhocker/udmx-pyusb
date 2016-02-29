@@ -23,10 +23,20 @@ Free Software Foundation, Inc.. See the LICENSE file for the full text of the li
 The full source is maintained on [GitHub](https://www.github.com/dhocker/uDMX-pyusb).
 
 ## Development Environment
+### Virtual Environment
 
 This work is written in Python 2.7.
 A suitable development environment would use virtualenv and virtualenvwrapper to create a working virtual environment.
 The requirements.txt file can be used with pip to create the required virtual environment with all dependencies.
+
+### PyUSB
+PyUSB requires one of the following: libusb 1.0, libusb 0.1 or OpenUSB. See [5](#5). libusb 1.0 is part of the 
+Raspbian Jessie image available from [raspberrypi.org](https://www.raspberrypi.org/downloads/raspbian/)
+
+### Operating Systems
+The main purpose of this project was to learn about using the uDMX interface on a RPi. However, enough of the work
+was done on OS X 10.11.3 to conclude that this code will work or can be made to work on both OSes. If you want to
+try it on OS X, use brew to install libusb (it will install libusb 1.0).
 
 ## Programs and Modules
 
@@ -53,7 +63,7 @@ For each invocation, this program does the following:
 * Loads the uDMX.conf file from /etc/uDMX.conf.
 * Activates the virtualenv defined in the conf file IF PyUSB is not found in the current environment.
 * Loads the .uDMXrc file defined in the conf file.
-* Locates the uDMX interface.
+* Locates the uDMX interface based on vendor ID and product ID.
 * Sends the DMX message defined by the command line arguments.
 
 uDMX.py uses the pyuDMX.py module.
@@ -69,6 +79,9 @@ Simple usage example:
     dev.open()
     dev.send_single_value(0, 255) # sends the value 255 to DMX channel 1
     dev.close()
+
+In this example, the open() method will default to opening the first uDMX interface 
+with vendor ID 0x16c0 and product ID 0x05dc.
 
 ## Learning Notes
 Here are some notes from this learning exercise.
@@ -166,6 +179,9 @@ a uDMX to another USB port will change one or both of those values.
 If you want to use multiple uDMX interfaces, you need to plug them in one at a time and use the lsusb command
 to determine the Bus and Device number for each one. And, after that you can't move them around.
 
+The pyuDMX.uDMXDevice.open() method will accept a bus number and device address if you need to manage multiple
+uDMX interfaces.
+
 Unless otherwise indicated, the programs in this repo will work with the first uDMX interface they find.
 
 ## Detailed USB Information
@@ -218,3 +234,4 @@ the firmware manufacturer not the hardware manufacturer. The firmware is open so
 2. [illutzminator](http://www.illutzminator.de/udmx.html?&L=1)
 3. [Markus Baertschi uDMX Utility](https://github.com/markusb/uDMX-linux)
 4. [Writing udev rules](http://www.reactivated.net/writing_udev_rules.html)
+5. <a id="5"></a>[PyUSB](https://github.com/walac/pyusb)
