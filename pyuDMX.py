@@ -30,15 +30,38 @@ class uDMXDevice:
     def __init__(self):
         self._dev = None
 
-    def open(self, vendor_id=0x16c0, product_id=0x5dc):
+    @property
+    def Device(self):
         """
-        Open the first device that matches the search criteria
+        Returns the wrapped usb.core.Device instance.
+        Refer to the usb.core.Device class for details of the Device class.
+        """
+        return self._dev
+
+    def open(self, vendor_id=0x16c0, product_id=0x5dc, bus=None, address=None):
+        """
+        Open the first device that matches the search criteria. Th default parameters
+        are set up for the likely most common case of a single uDMX interface.
+        However, for the case of multiple uDMX interfaces, you can use the
+        bus and address paramters to further specifiy the uDMX interface
+        to be opened.
         :param vendor_id:
         :param product_id:
+        :param bus: USB bus number 1-n
+        :param address: USB device address 1-n
         :return: Returns true if a device was opened. Otherwise, returns false.
         """
+        kwargs = {}
+        if vendor_id:
+            kwargs["idVendor"] = vendor_id
+        if product_id:
+            kwargs["idProduct"] = product_id
+        if bus:
+            kwargs["bus"] = bus
+        if address:
+            kwargs["address"] = address
         # Find the uDMX interface
-        self._dev = usb.core.find(idVendor=vendor_id, idProduct=product_id)
+        self._dev = usb.core.find(**kwargs)
         return self._dev is not None
 
     def close(self):
