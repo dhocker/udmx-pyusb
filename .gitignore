@@ -2,4 +2,5 @@
 *.log*
 *~
 .idea
-
+dist/
+*.egg-info

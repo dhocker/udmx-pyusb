@@ -110,7 +110,7 @@ except:
         print "Install PyUSB or specify a virtualenv with PyUSB via the /etc/uDMX.conf file."
         exit(0)
 
-import pyuDMX
+from pyuDMX import pyuDMX
 
 # channel/value dictionary
 channels_key = "channels"
