@@ -30,7 +30,7 @@ def read(*paths):
         return f.read()
 
 setup(
-    name='pyuDMX',
+    name='pyudmx',
     version='1.0.0',
     description='uDMX Interface Library',
     long_description=(read('ReadMe.md')),

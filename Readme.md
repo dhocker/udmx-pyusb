@@ -66,16 +66,16 @@ For each invocation, this program does the following:
 * Locates the uDMX interface based on vendor ID and product ID.
 * Sends the DMX message defined by the command line arguments.
 
-uDMX.py uses the pyuDMX.py module.
+uDMX.py uses the pyudmx.py module.
 
-### pyuDMX.py Module
-The pyuDMX.py module provides a simple, easy to use module for talking to the uDMX interface. Essentially,
+### pyudmx.py Module
+The pyudmx.py module provides a simple, easy to use module for talking to the uDMX interface. Essentially,
 it is a uDMX specific adapter on top of the pyusb module. If you want to write a uDMX oriented application
-consider starting with pyuDMX.py.
+consider starting with pyudmx.py.
 
 Simple usage example:
 
-    dev = pyuDMX.uDMXDevice()
+    dev = pyudmx.uDMXDevice()
     dev.open()
     dev.send_single_value(0, 255) # sends the value 255 to DMX channel 1
     dev.close()
@@ -179,7 +179,7 @@ a uDMX to another USB port will change one or both of those values.
 If you want to use multiple uDMX interfaces, you need to plug them in one at a time and use the lsusb command
 to determine the Bus and Device number for each one. And, after that you can't move them around.
 
-The pyuDMX.uDMXDevice.open() method will accept a bus number and device address if you need to manage multiple
+The pyudmx.uDMXDevice.open() method will accept a bus number and device address if you need to manage multiple
 uDMX interfaces.
 
 Unless otherwise indicated, the programs in this repo will work with the first uDMX interface they find.

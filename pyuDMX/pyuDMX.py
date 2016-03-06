@@ -1,4 +1,4 @@
-# pyuDMX.py - Anyma (and clones) uDMX interface module
+# pyudmx.py - Anyma (and clones) uDMX interface module
 # Copyright (C) 2016  Dave Hocker (email: AtHomeX10@gmail.com)
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 #
 # Usage example
 #
-# dev = pyuDMX.uDMXDevice()
+# dev = pyudmx.uDMXDevice()
 # dev.open()
 # dev.send_single_value(0, 255) # sends the value 255 to DMX channel 1
 # dev.close()

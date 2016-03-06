@@ -110,7 +110,7 @@ except:
         print "Install PyUSB or specify a virtualenv with PyUSB via the /etc/uDMX.conf file."
         exit(0)
 
-from pyuDMX import pyuDMX
+from pyudmx import pyudmx
 
 # channel/value dictionary
 channels_key = "channels"
@@ -165,7 +165,7 @@ def are_valid_values(values):
 
 def load_rc_file():
     """
-    Load the contents of the configuration file ~/.uDMXrc
+    Load the contents of the resource file ~/.uDMXrc
     """
     # If an rc file is named in the config, use it.
     # Otherwise, fall back to looking in the HOME directory.
@@ -213,10 +213,10 @@ def load_rc_file():
             # Something we don't recognize
             else:
                 print line
-                print tokens[0], "is not a recognized configuration file statement"
+                print tokens[0], "is not a recognized resource file statement"
         cf.close()
     except:
-        print "Unable to open configuration file", rcfile
+        print "Unable to open resource file", rcfile
 
 
 def translate_message_tokens(message_tokens):
@@ -254,7 +254,7 @@ def send_dmx_message(message_tokens):
     """
 
     # Open the uDMX USB device
-    dev = pyuDMX.uDMXDevice()
+    dev = pyudmx.uDMXDevice()
     if not dev.open():
         print "Unable to find and open uDMX interface"
         return False
@@ -292,7 +292,7 @@ def send_dmx_message(message_tokens):
 import argparse
 
 if __name__ == "__main__":
-    print "uDMX.py - uDMX utility program - version 0.95"
+    print "uDMX.py - uDMX utility program - version 0.96"
 
     # Set up command line parsing
     parser = argparse.ArgumentParser()
