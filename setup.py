@@ -33,7 +33,7 @@ setup(
     name='pyudmx',
     version='1.0.0',
     description='uDMX Interface Library',
-    long_description=(read('ReadMe.md')),
+    long_description=(read('Readme.md')),
     url='www.github.com/dhocker',
     license='GPLv3. See LICENSE file.',
     author='Dave Hocker',
