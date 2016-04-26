@@ -35,7 +35,7 @@ setup(
     version='1.0.0',
     description='uDMX Interface Library',
     long_description=(read('Readme.md')),
-    url='www.github.com/dhocker',
+    url='www.github.com/dhocker/udmx-pyusb',
     license='GPLv3. See LICENSE file.',
     author='Dave Hocker',
     author_email='AtHomeX10@gmail.com',
