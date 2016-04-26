@@ -17,7 +17,8 @@
 # python setup.py sdist
 #
 # To install distribution in current venv:
-# pip install -U dist/elfstonelib-a.b.c.tar.gz
+#   pip install -U dist/pyudmx-x.y.z.tar.gz
+# where x.y.z is the version number (e.g. 1.0.0)
 #
 
 import os
