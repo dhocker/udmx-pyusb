@@ -309,25 +309,32 @@ Full-Width Styles
 
 #project_tagline {
   color: #fff;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 300;
   background: none;
   text-shadow: #111 0px 0px 10px;
 }
 
-#downloads {
-  position: absolute;
-  width: 315px;
+.downloads {
+  /*position: absolute;*/
+  width: 500px;
   z-index: 10;
   bottom: -40px;
   right: 0;
   height: 70px;
+  padding-left: 40px;
   background: url('../images/icon_download.png') no-repeat 0% 90%;
+}
+
+.download_type {
+    display: block;
+    float: left;
+    margin-left: 10px;
 }
 
 .zip_download_link {
   display: block;
-  float: right;
+  float: left;
   width: 90px;
   height:70px;
   text-indent: -5000px;
@@ -337,7 +344,7 @@ Full-Width Styles
 
 .tar_download_link {
   display: block;
-  float: right;
+  float: left;
   width: 90px;
   height:70px;
   text-indent: -5000px;
@@ -361,7 +368,7 @@ Full-Width Styles
 }
 
 #main_content {
-  padding-top: 40px;
+  padding-top: 20px;
 }
 
 #footer_wrap {
