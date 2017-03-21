@@ -35,21 +35,23 @@ case you are looking for a uDMX type of interface.
 
 # Requires a venv with pyusb installed. See requirements.txt.
 
-# In order to directly access a USB port, you must be running sudo.
+# If you apply the udev rule, the uDMX will be accessible as the pi user.
+# If youdo not apply the udev rule, you must be running sudo.
 # This appears to be the recommended way to activate the venv
 # when running under sudo. However, it hard wires the venv to this script.
-# At a minimum we need a runtime test so the work aroud is only executed
+# At a minimum we need a runtime test so the work around is only executed
 # when running on an RPi.
-import platform
+# the rest of this research code assumes the udev rule has been applied.
+# import platform
 # Here we make a gross assumption that an arm cpu is an RPi.
-if platform.machine().startswith("arm"):
-	activate_this = "/home/pi/Virtualenvs/pyusb/bin/activate_this.py"
-	execfile(activate_this, dict(__file__=activate_this))
+# if platform.machine().startswith("arm"):
+#	activate_this = "/home/pi/Virtualenvs/pyusb/bin/activate_this.py"
+#	execfile(activate_this, dict(__file__=activate_this))
 
 import usb # This is pyusb
 import time
 
-# DEVICE ID 16c0:05dc on Bus 001 Address 005
+# DEVICE ID 16c0:05dc
 # USB id's for uDMX (aka Anyma uDMX)
 # The attached DMX device was a Venue ThinPar64.
 
@@ -57,8 +59,15 @@ import time
 vid = 0x16c0
 pid = 0x05dc
 
-# Find the uDMX interface
+# Find the uDMX interface by vendor and product ID
 dev = usb.core.find(idVendor=vid, idProduct=pid)
+# This would find the uDMX by bus number and address (aka port)
+# dev = usb.core.find(bus=1, address=4)
+#
+# You could find the uDMX by using the SYMLINK that the udev rule sets up.
+# links = glob.glob("/dev/uDMXusb*")
+# os.path.realpath(links[0]) # returns something like /dev/bus/usb/001/004
+# You can use a regex to pull out the bus (001) and address (004).
 
 if dev is None:
 	print "uDMX device was not found"

@@ -4,8 +4,8 @@
 # Uncomment the rule you want to use
 #
 # This rule gives all users read/write access
-# SUBSYSTEM=="usb", ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", MODE="0666"
+# SUBSYSTEM=="usb|usb_device", ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", MODE="0666", SYMLINK+="uDMXusb%n"
 #
 # This rule gives members of the pi group read/write access (recommended).
 # All other users have read-only access which effectively makes the device unuseable.
-# SUBSYSTEM=="usb", ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", GROUP="pi"
+# SUBSYSTEM=="usb|usb_device", ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", GROUP="pi", SYMLINK+="uDMXusb%n"
