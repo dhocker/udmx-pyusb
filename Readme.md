@@ -83,6 +83,8 @@ Simple usage example:
 In this example, the open() method will default to opening the first uDMX interface 
 with vendor ID 0x16c0 and product ID 0x05dc.
 
+A more complete programming example can be found in the **example.py** file.
+
 ## Learning Notes
 Here are some notes from this learning exercise.
 
