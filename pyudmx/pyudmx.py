@@ -20,7 +20,7 @@
 #
 # dev = pyudmx.uDMXDevice()
 # dev.open()
-# dev.send_single_value(0, 255) # sends the value 255 to DMX channel 1
+# dev.send_single_value(1, 255) # sends the value 255 to DMX channel 1
 # dev.close()
 #
 
