@@ -150,6 +150,26 @@ pi group (which includes pi) have read/write access and all other users have rea
 You can choose this rule by editing 98-uDMX-usb.rules file and uncommenting
 the line that contains this rule.
 
+## Symlinks
+You can use a udev rule to create a symlink for a uDMX device.
+
+    SUBSYSTEM=="usb", ATTR{idVendor}=="16c0", ATTR{idProduct}=="05dc", GROUP="pi", SYMLINK+="uDMXusb%n"
+
+This rule will produce a symlink for each uDMX device found.
+
+    ~/rpi/uDMX-pyusb $ ll /dev/uDMXusb*
+    lrwxrwxrwx 1 root root 15 Mar 21 16:29 /dev/uDMXusb2 -> bus/usb/001/005
+
+Looking at these permissions you might think that there is open access to the uDMX.
+However, that is not the case. The permissions of the the symlink target prevail.
+The symlink simply allows all access to the symlink itself.
+
+    ~/rpi/uDMX-pyusb $ ll /dev/bus/usb/001/005
+    crw-rw-r-- 1 root pi 189, 15 Mar 21 16:29 /dev/bus/usb/001/005
+
+Thanks to [muzzol](https://github.com/muzzol) for this tip.
+
+## udev Rules
 For more on udev rules see [Writing udev rules](http://www.reactivated.net/writing_udev_rules.html).
 
 ## Reboot Issues
