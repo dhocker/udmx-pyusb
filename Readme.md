@@ -25,18 +25,42 @@ The full source is maintained on [GitHub](https://www.github.com/dhocker/uDMX-py
 ## Development Environment
 ### Virtual Environment
 
-This work is written in Python 2.7.
+This work was originally written in Python 2.7 but has been adapted for both Python 2 and Python 3.
 A suitable development environment would use virtualenv and virtualenvwrapper to create a working virtual environment.
-The requirements.txt file can be used with pip to create the required virtual environment with all dependencies.
+The **requirements.txt** file can be used with pip to create the required virtual environment with all dependencies.
+
+Here are some references for setting up virtualenv and virtualenvwrapper.
+
+* [virtualenv and virtualenvwrapper](http://docs.python-guide.org/en/latest/dev/virtualenvs/)
+* [virtualenv and virtualenvwrapper on Linux](http://nayon.net/install-virtualenv-and-virtualenvwrapper-on-ubuntu/)
+* [pip and virtualenv on Windows](http://programwithus.com/learn-to-code/Pip-and-virtualenv-on-Windows/)
+* [virtualenvwrapper on Windows](https://pypi.org/project/virtualenvwrapper-win/)
+* [virtualenv and virtualenvwrapper on macOS](http://exponential.io/blog/2015/02/10/install-virtualenv-and-virtualenvwrapper-on-mac-os-x/)
+
+A quick Internet search will reveal many articles on how to install and setup virtualenv/virtualenvwrapper on
+most any OS.
 
 ### PyUSB
 PyUSB requires one of the following: libusb 1.0, libusb 0.1 or OpenUSB. See [5](#5). libusb 1.0 is part of the 
-Raspbian Jessie image available from [raspberrypi.org](https://www.raspberrypi.org/downloads/raspbian/)
+Raspbian Jessie image available from [raspberrypi.org](https://www.raspberrypi.org/downloads/raspbian/). How to
+install libusb on [Windows](#windows) and [macOS](#macos) is covered below.
 
 ### Operating Systems
-The main purpose of this project was to learn about using the uDMX interface on a RPi. However, enough of the work
+#### Raspbian
+The main purpose of this project was to learn about using the uDMX interface on an RPi. And, this is the
+primary environment where the author deploys the code.
+#### macOS 
+However, enough of the work
 was done on OS X 10.11.3 to conclude that this code will work or can be made to work on both OSes. If you want to
 try it on OS X, use brew to install libusb (it will install libusb 1.0).
+#### Windows
+The code has also been tested on Windows 10. To get this to work, you must install a Windows version of libusb. 
+There are likely a number of ways to get a libusb installed.
+However, the following libusb version has been successfully tested:
+[libusb-win32](https://sourceforge.net/projects/libusb-win32/) using this  
+[installer](https://sourceforge.net/projects/libusb-win32/files/libusbK-release/libusbK-3.0.7.0-setup-chk.exe/download).
+The key is to follow the instructions for the "Driver Install Creator Wizard". You need to create a driver for the
+uDMX interface.
 
 ## Programs and Modules
 
@@ -86,7 +110,8 @@ with vendor ID 0x16c0 and product ID 0x05dc.
 A more complete programming example can be found in the **example.py** file.
 
 ## Learning Notes
-Here are some notes from this learning exercise.
+Here are some notes from this learning exercise using Raspbian Jessie on an Rpi. The lessons learned
+here apply to most Linux systems, but probably do not apply to Windows or macOS.
 
 ### Finding the uDMX Interface
 As there is no kernel driver for the uDMX, it does not show up under /dev like /dev/tty.
