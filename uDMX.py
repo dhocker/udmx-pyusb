@@ -181,7 +181,12 @@ def load_rc_file():
     if "uDMXrc" in config:
         rcfile = config["uDMXrc"]
     else:
-        rcfile = os.environ["HOME"] + "/.uDMXrc"
+        if os.name == "nt":
+            # Windows
+            rcfile = os.path.join(os.environ["USERPROFILE"], ".uDMXrc")
+        else:
+            # Mostly *nix type systems
+            rcfile = os.path.join(os.environ["HOME"], ".uDMXrc")
     try:
         cf = open(rcfile, 'r')
         for line in cf:
