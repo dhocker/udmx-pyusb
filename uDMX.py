@@ -41,21 +41,21 @@ def load_conf(cfg_path):
         cfg = open(cfg_path, 'r')
     except Exception as ex:
         if verbose:
-            print "Unable to open {0}".format(cfg_path)
-            print str(ex)
+            print("Unable to open {0}".format(cfg_path))
+            print(str(ex))
         return False
       
     # Read the entire contents of the conf file
     cfg_json = cfg.read()
     cfg.close()
-    #print cfg_json
+    #print(cfg_json)
     
     # Try to parse the conf file into a Python structure
     try:
         config = json.loads(cfg_json)
     except Exception as ex:
-        print "Unable to parse configuration file as JSON"
-        print str(ex)
+        print("Unable to parse configuration file as JSON")
+        print(str(ex))
         return False
 
     # This config was successfully loaded
@@ -63,10 +63,14 @@ def load_conf(cfg_path):
 
 # Try to load the conf file from one of these well known places.
 # If there isn't one, we give up.
-places = ["/etc/uDMX.conf",
-          os.environ["HOME"] + "/uDMX.conf",
-          os.getcwd() + "/uDMX.conf"
-          ]
+# use os.path.join()
+places = []
+places.append(os.path.join(os.getcwd(), "uDMX.conf"))
+if os.name == "nt":
+    places.append(os.path.join(os.environ["USERPROFILE"], "uDMX.conf"))
+else:
+    places.append(os.path.join(os.environ["HOME"], "uDMX.conf"))
+    places.append("/etc/uDMX.conf")
 
 for cfg_path in places:
     if load_conf(cfg_path):
@@ -74,10 +78,10 @@ for cfg_path in places:
         break
 
 if loaded_conf is None:
-    print "Unable to find a uDMX.conf file"
+    print("Unable to find a uDMX.conf file")
     exit(0)
 
-# print "Configuration:", config
+# print("Configuration:", config)
     
 # Find the pyusb module and import it
 try:
@@ -104,10 +108,10 @@ except:
 
         import usb  # This is pyusb
 
-        # print "usb imported from virtualenv."
+        # print("usb imported from virtualenv.")
     else:
-        print "Unable to import usb (the PyUSB module)."
-        print "Install PyUSB or specify a virtualenv with PyUSB via the /etc/uDMX.conf file."
+        print("Unable to import usb (the PyUSB module).")
+        print("Install PyUSB or specify a virtualenv with PyUSB via the /etc/uDMX.conf file.")
         exit(0)
 
 from pyudmx import pyudmx
@@ -158,7 +162,7 @@ def are_valid_values(values):
             else:
                 return False
     except Exception as ex:
-        # print ex
+        # print(ex)
         return False
     return True
 
@@ -169,7 +173,7 @@ def load_rc_file():
     """
     # If an rc file is named in the config, use it.
     # Otherwise, fall back to looking in the HOME directory.
-    # The fall back  won't work under RPi because HOME will be root.
+    # The fall back won't work under RPi because HOME will be root.
     if "uDMXrc" in config:
         rcfile = config["uDMXrc"]
     else:
@@ -193,11 +197,11 @@ def load_rc_file():
                     if is_valid_channel(tokens[2]):
                         add_channel(tokens[1], tokens[2])
                     else:
-                        print line
-                        print "Invalid channel value"
+                        print(line)
+                        print("Invalid channel value")
                 else:
-                    print line
-                    print "Invalid channel statement"
+                    print(line)
+                    print("Invalid channel statement")
             # A DMX value or values
             elif tokens[0] in ['value', 'values']:
                 # value alias value
@@ -205,18 +209,18 @@ def load_rc_file():
                     if are_valid_values(tokens[2:]):
                         add_values(tokens[1], tokens[2:])
                     else:
-                        print line
-                        print "Invalid value(s)"
+                        print(line)
+                        print("Invalid value(s)")
                 else:
-                    print line
-                    print "Invalid value statement"
+                    print(line)
+                    print("Invalid value statement")
             # Something we don't recognize
             else:
-                print line
-                print tokens[0], "is not a recognized resource file statement"
+                print(line)
+                print(tokens[0], "is not a recognized resource file statement")
         cf.close()
     except:
-        print "Unable to open resource file", rcfile
+        print("Unable to open resource file", rcfile)
 
 
 def translate_message_tokens(message_tokens):
@@ -244,7 +248,7 @@ def dump_dict():
     """
     Diagnostic dump of channel/value dictionary.
     """
-    print cv_dict
+    print(cv_dict)
 
 def send_dmx_message(message_tokens):
     """
@@ -256,7 +260,7 @@ def send_dmx_message(message_tokens):
     # Open the uDMX USB device
     dev = pyudmx.uDMXDevice()
     if not dev.open():
-        print "Unable to find and open uDMX interface"
+        print("Unable to find and open uDMX interface")
         return False
 
     # Translate the tokens into integers.
@@ -267,17 +271,17 @@ def send_dmx_message(message_tokens):
     if len(trans_tokens) == 2:
         # Single value message
         if verbose:
-            print "Sending single value message channel:", trans_tokens[0], "value:", trans_tokens[1]
+            print("Sending single value message channel:", trans_tokens[0], "value:", trans_tokens[1])
         n = dev.send_single_value(trans_tokens[0], trans_tokens[1])
         if verbose:
-            print "Sent", n, "value"
+            print("Sent", n, "value")
     else:
         # Multi-value message
         if verbose:
-            print "Sending multi-value message channel:", trans_tokens[0], "values:", trans_tokens[1:]
+            print("Sending multi-value message channel:", trans_tokens[0], "values:", trans_tokens[1:])
         n = dev.send_multi_value(trans_tokens[0], trans_tokens[1:])
         if verbose:
-            print "Sent", n, "values"
+            print("Sent", n, "values")
 
     # This may not be absolutely necessary, but it is safe.
     # It's the closest thing to a close() method.
@@ -292,7 +296,7 @@ def send_dmx_message(message_tokens):
 import argparse
 
 if __name__ == "__main__":
-    print "uDMX.py - uDMX utility program - version 0.96"
+    print("uDMX.py - uDMX utility program - version 0.96")
 
     # Set up command line parsing
     parser = argparse.ArgumentParser()
@@ -320,8 +324,8 @@ if __name__ == "__main__":
     msg_tokens.extend(args.channel)
     msg_tokens.extend(args.value)
     if verbose:
-        print "Message tokens:", msg_tokens
+        print("Message tokens:", msg_tokens)
     if send_dmx_message(msg_tokens):
-        print "Message sent"
+        print("Message sent")
     else:
-        print "Message failed"
+        print("Message failed")

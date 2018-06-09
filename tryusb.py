@@ -70,7 +70,7 @@ dev = usb.core.find(idVendor=vid, idProduct=pid)
 # You can use a regex to pull out the bus (001) and address (004).
 
 if dev is None:
-	print "uDMX device was not found"
+	print("uDMX device was not found")
 	exit(0)
 
 #
@@ -79,28 +79,28 @@ if dev is None:
 # at the source code on github: https://github.com/walac/pyusb/tree/master/usb
 #
 
-print "**********uDMX Device"
-print "type:", type(dev)
-print dev
+print("**********uDMX Device")
+print("type:", type(dev))
+print(dev)
 
-print "**********MANUFACTURER"
-print dev.manufacturer
+print("**********MANUFACTURER")
+print(dev.manufacturer)
 if dev.manufacturer != "www.anyma.ch":
-	print "Error - expected www.anyma.ch, actual " + dev.manufacturer
+	print("Error - expected www.anyma.ch, actual " + dev.manufacturer)
 
-print "**********PRODUCT"
-print dev.product
+print("**********PRODUCT")
+print(dev.product)
 
 dev.set_configuration()
 cfg = dev.get_active_configuration()
-print "**********CONFIGURATION"
-print "type:", type(cfg)
-print cfg
+print("**********CONFIGURATION")
+print("type:", type(cfg))
+print(cfg)
 
 intf = cfg[0,0]
-print "**********INTERFACE"
-print "type:", type(intf)
-print intf
+print("**********INTERFACE")
+print("type:", type(intf))
+print(intf)
 
 ep = usb.util.find_descriptor(intf,     
 	# match the first OUT endpoint
@@ -108,15 +108,15 @@ ep = usb.util.find_descriptor(intf,
     lambda e: \
         usb.util.endpoint_direction(e.bEndpointAddress) == \
         usb.util.ENDPOINT_OUT)
-print "**********ENDPOINT"
+print("**********ENDPOINT")
 if ep:
-	print ep
+	print(ep)
 else:
-	print "This device.configuration.interface does not have an OUT endpoint"
+	print("This device.configuration.interface does not have an OUT endpoint")
 
 status = usb.control.get_status(dev)
-print "**********STATUS"
-print "Status:", status
+print("**********STATUS")
+print("Status:", status)
 
 cmd_SetSingleChannel = 1
 """
@@ -175,29 +175,29 @@ bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb
 channel = 6 # mode channel
 channel_value = 255 # on all the way
 n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
-print "Sent:", n 
+print("Sent:", n)
 
 # Bring dimmer to 100%
 channel = 7 # dimmer channel
 channel_value = 255 # on all the way
 n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
-print "Sent:", n 
+print("Sent:", n)
 
 # Turn light on
 channel = 2 # blue channel
 channel_value = 255 # on all the way
 n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
-print "Sent:", n 
+print("Sent:", n)
 
-print "Sleeping..."
+print("Sleeping...")
 time.sleep(3.000)
 
 # Turn light off
 channel_value = 0
 n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
-print "Sent:", n 
+print("Sent:", n)
 
-print "Sleeping..."
+print("Sleeping...")
 time.sleep(2.000)
 
 # Interface for setting multiple channels at one time
@@ -210,14 +210,14 @@ channel = 0 # Red channel
 # Turn on red, green and blue lights
 n = dev.ctrl_transfer(bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
 	wIndex=channel, data_or_wLength=channel_values)
-print "Sent:", n 
+print("Sent:", n)
 
-print "Sleeping..."
+print("Sleeping...")
 time.sleep(3.000)
 
 channel_values = bytearray([0, 0, 0]) # all off
 # Turn off red, green and blue
 n = dev.ctrl_transfer(bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
 	wIndex=channel, data_or_wLength=channel_values)
-print "Sent:", n 
+print("Sent:", n)
 

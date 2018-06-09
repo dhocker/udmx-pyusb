@@ -32,7 +32,7 @@ def read(*paths):
 
 setup(
     name='pyudmx',
-    version='1.0.0',
+    version='1.1.0',
     description='uDMX Interface Library',
     long_description=(read('Readme.md')),
     url='www.github.com/dhocker/udmx-pyusb',
