@@ -24,6 +24,7 @@
 
 import json
 import os
+import sys
 
 # The active configuration
 loaded_conf = None
@@ -63,7 +64,6 @@ def load_conf(cfg_path):
 
 # Try to load the conf file from one of these well known places.
 # If there isn't one, we give up.
-# use os.path.join()
 places = []
 places.append(os.path.join(os.getcwd(), "uDMX.conf"))
 if os.name == "nt":
@@ -102,9 +102,13 @@ except:
 
     # If a virtualenv is defined in the config file, use it.
     if "venv" in config:
-        activate_this = config["venv"] + "/bin/activate_this.py"
+        activate_this = os.path.join(config["venv"], "bin/activate_this.py")
         # On the raspberry pi 2 this is pretty expensive
-        execfile(activate_this, dict(__file__=activate_this))
+        # On Python 2 is's execfile. One Python 3 it's exec.
+        if sys.version_info[0] < 3:
+            execfile(activate_this, dict(__file__=activate_this))
+        else:
+            exec(open(activate_this).read())
 
         import usb  # This is pyusb
 
