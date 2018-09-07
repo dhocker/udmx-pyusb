@@ -33,6 +33,7 @@ config = {}
 # Global options
 verbose = False
 
+
 def load_conf(cfg_path):
     """
     Try to load the given conf file.
@@ -45,12 +46,12 @@ def load_conf(cfg_path):
             print("Unable to open {0}".format(cfg_path))
             print(str(ex))
         return False
-      
+
     # Read the entire contents of the conf file
     cfg_json = cfg.read()
     cfg.close()
-    #print(cfg_json)
-    
+    # print(cfg_json)
+
     # Try to parse the conf file into a Python structure
     try:
         config = json.loads(cfg_json)
@@ -61,6 +62,7 @@ def load_conf(cfg_path):
 
     # This config was successfully loaded
     return True
+
 
 # Try to load the conf file from one of these well known places.
 # If there isn't one, we give up.
@@ -82,7 +84,7 @@ if loaded_conf is None:
     exit(0)
 
 # print("Configuration:", config)
-    
+
 # Find the pyusb module and import it
 try:
     import usb  # this is pyusb
@@ -259,6 +261,7 @@ def dump_dict():
     """
     print(cv_dict)
 
+
 def send_dmx_message(message_tokens):
     """
     Send the DMX message defined by the command line arguments (message tokens).
@@ -298,7 +301,8 @@ def send_dmx_message(message_tokens):
 
     # Returns True if something was sent
     return n > 0
-    
+
+
 #
 # Main program
 #
@@ -309,18 +313,18 @@ if __name__ == "__main__":
 
     # Set up command line parsing
     parser = argparse.ArgumentParser()
-    parser.add_argument("channel", nargs=1, 
-        help="DMX channel number (1-512) or channel name")
-    parser.add_argument("value", nargs="+", 
-        help="One or more DMX channel values (0-255) or value names")
-    parser.add_argument("-v", "--verbose", 
-        help="Produce verbose output", action="store_true")
+    parser.add_argument("channel", nargs=1,
+                        help="DMX channel number (1-512) or channel name")
+    parser.add_argument("value", nargs="+",
+                        help="One or more DMX channel values (0-255) or value names")
+    parser.add_argument("-v", "--verbose",
+                        help="Produce verbose output", action="store_true")
     args = parser.parse_args()
 
     verbose = args.verbose
 
     # Filter out requests for help and insufficient command line arguments
-    #if len(sys.argv) < 2 or (len(sys.argv) == 2 and (sys.argv[1] == "--help" or sys.argv[1] == "-h")):
+    # if len(sys.argv) < 2 or (len(sys.argv) == 2 and (sys.argv[1] == "--help" or sys.argv[1] == "-h")):
     #    help()
     #    exit(0)
 

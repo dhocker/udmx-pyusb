@@ -48,7 +48,7 @@ case you are looking for a uDMX type of interface.
 #	activate_this = "/home/pi/Virtualenvs/pyusb/bin/activate_this.py"
 #	execfile(activate_this, dict(__file__=activate_this))
 
-import usb # This is pyusb
+import usb  # This is pyusb
 import time
 
 # DEVICE ID 16c0:05dc
@@ -70,8 +70,8 @@ dev = usb.core.find(idVendor=vid, idProduct=pid)
 # You can use a regex to pull out the bus (001) and address (004).
 
 if dev is None:
-	print("uDMX device was not found")
-	exit(0)
+    print("uDMX device was not found")
+    exit(0)
 
 #
 # It looks like the only way to determine what methods and
@@ -86,7 +86,7 @@ print(dev)
 print("**********MANUFACTURER")
 print(dev.manufacturer)
 if dev.manufacturer != "www.anyma.ch":
-	print("Error - expected www.anyma.ch, actual " + dev.manufacturer)
+    print("Error - expected www.anyma.ch, actual " + dev.manufacturer)
 
 print("**********PRODUCT")
 print(dev.product)
@@ -97,22 +97,22 @@ print("**********CONFIGURATION")
 print("type:", type(cfg))
 print(cfg)
 
-intf = cfg[0,0]
+intf = cfg[0, 0]
 print("**********INTERFACE")
 print("type:", type(intf))
 print(intf)
 
-ep = usb.util.find_descriptor(intf,     
-	# match the first OUT endpoint
-    custom_match = \
-    lambda e: \
-        usb.util.endpoint_direction(e.bEndpointAddress) == \
-        usb.util.ENDPOINT_OUT)
+ep = usb.util.find_descriptor(intf,
+                              # match the first OUT endpoint
+                              custom_match= \
+                                  lambda e: \
+                                      usb.util.endpoint_direction(e.bEndpointAddress) == \
+                                      usb.util.ENDPOINT_OUT)
 print("**********ENDPOINT")
 if ep:
-	print(ep)
+    print(ep)
 else:
-	print("This device.configuration.interface does not have an OUT endpoint")
+    print("This device.configuration.interface does not have an OUT endpoint")
 
 status = usb.control.get_status(dev)
 print("**********STATUS")
@@ -163,7 +163,7 @@ usb request for cmd_SetChannelRange:
 
 # All data tranfers use this request type. This is more for
 # the PyUSB package than for the uDMX.
-bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb.util.CTRL_OUT 
+bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb.util.CTRL_OUT
 
 # Single channel value transfer
 # Interface for setting a single channel data value
@@ -172,20 +172,20 @@ bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb
 # data_or_wLength - not used for this case. However, on success this will be the return value.
 
 # Set RGB mode (Venue ThinPar64 is in 7-channel mode)
-channel = 6 # mode channel
-channel_value = 255 # on all the way
+channel = 6  # mode channel
+channel_value = 255  # on all the way
 n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
 print("Sent:", n)
 
 # Bring dimmer to 100%
-channel = 7 # dimmer channel
-channel_value = 255 # on all the way
+channel = 7  # dimmer channel
+channel_value = 255  # on all the way
 n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
 print("Sent:", n)
 
 # Turn light on
-channel = 2 # blue channel
-channel_value = 255 # on all the way
+channel = 2  # blue channel
+channel_value = 255  # on all the way
 n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
 print("Sent:", n)
 
@@ -205,19 +205,18 @@ time.sleep(2.000)
 # wIndex - starting channel number, 0-511.
 # data_or_wLength - sequence type of data, e.g. a bytearray
 
-channel_values = bytearray([255, 255, 255]) # RGB all on
-channel = 0 # Red channel
+channel_values = bytearray([255, 255, 255])  # RGB all on
+channel = 0  # Red channel
 # Turn on red, green and blue lights
 n = dev.ctrl_transfer(bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
-	wIndex=channel, data_or_wLength=channel_values)
+                      wIndex=channel, data_or_wLength=channel_values)
 print("Sent:", n)
 
 print("Sleeping...")
 time.sleep(3.000)
 
-channel_values = bytearray([0, 0, 0]) # all off
+channel_values = bytearray([0, 0, 0])  # all off
 # Turn off red, green and blue
 n = dev.ctrl_transfer(bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
-	wIndex=channel, data_or_wLength=channel_values)
+                      wIndex=channel, data_or_wLength=channel_values)
 print("Sent:", n)
-

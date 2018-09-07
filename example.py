@@ -43,45 +43,45 @@ def main():
 
     # Channel value list for channels 1-512
     cv = [0 for v in range(0, 512)]
-    
+
     # Create an instance of the DMX controller and open it    
-    print "Opening DMX controller..."
+    print("Opening DMX controller...")
     dev = pyudmx.uDMXDevice()
     # This will automagically find a single Anyma-type USB DMX controller
     dev.open()
     # For informational purpose, display what we know about the DMX controller
-    print dev.Device
-    
+    print(dev.Device)
+
     # Send messages to the light changing it to red, then green, then blue
     # This is the "hard way" to do it, but illustrates how it's done
 
-    print "Setting to red..."
-    cv[0] = 255 # red
-    cv[6] = 128 # dimmer to half value
+    print("Setting to red...")
+    cv[0] = 255  # red
+    cv[6] = 128  # dimmer to half value
     sent = dev.send_multi_value(1, cv)
-    print "Set to red"
+    print("Set to red")
     sleep(3.0)
 
-    print "Setting to green..."
-    cv[0] = 0 # red
-    cv[1] = 255 # green
-    cv[6] = 128 # dimmer to half value
+    print("Setting to green...")
+    cv[0] = 0  # red
+    cv[1] = 255  # green
+    cv[6] = 128  # dimmer to half value
     sent = dev.send_multi_value(1, cv)
-    print "Set to green"
+    print("Set to green")
     sleep(3.0)
 
-    print "Setting to blue..."
-    cv[0] = 0 # red
-    cv[1] = 0 # green
-    cv[2] = 255 # blue
-    cv[6] = 128 # dimmer to half value
+    print("Setting to blue...")
+    cv[0] = 0  # red
+    cv[1] = 0  # green
+    cv[2] = 255  # blue
+    cv[6] = 128  # dimmer to half value
     sent = dev.send_multi_value(1, cv)
-    print "Set to blue"
+    print("Set to blue")
     sleep(3.0)
-    
+
     # Here's an easier way to do it
 
-    print "And, again the easier way"
+    print("And, again the easier way")
     send_rgb(dev, 255, 0, 0, 128)
     sleep(3.0)
     send_rgb(dev, 0, 255, 0, 128)
@@ -89,12 +89,13 @@ def main():
     send_rgb(dev, 0, 0, 255, 128)
     sleep(3.0)
 
-    print "Reset all channels and close.."
+    print("Reset all channels and close..")
     # Turns the light off
     cv = [0 for v in range(0, 512)]
     dev.send_multi_value(1, cv)
     dev.close()
 
+
 if __name__ == "__main__":
     main()
-    print "Done"
+    print("Done")
