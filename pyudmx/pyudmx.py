@@ -24,21 +24,23 @@
 # dev.close()
 #
 
-import usb # the pyusb module is required to be in the current environment
+import usb  # the pyusb module is required to be in the current environment
+from typing import Union, List  # support type hinting
+
 
 class uDMXDevice:
     def __init__(self):
         self._dev = None
 
     @property
-    def Device(self):
+    def Device(self) -> usb.core.Device:
         """
         Returns the wrapped usb.core.Device instance.
         Refer to the usb.core.Device class for details of the Device class.
         """
         return self._dev
 
-    def open(self, vendor_id=0x16c0, product_id=0x5dc, bus=None, address=None):
+    def open(self, vendor_id: int = 0x16c0, product_id: int = 0x5dc, bus: int = None, address: int = None) -> bool:
         """
         Open the first device that matches the search criteria. Th default parameters
         are set up for the likely most common case of a single uDMX interface.
@@ -75,7 +77,8 @@ class uDMXDevice:
             usb.util.dispose_resources(self._dev)
             self._dev = None
 
-    def _send_control_message(self, cmd, value_or_length=1, channel=1, data_or_length=1):
+    def _send_control_message(self, cmd: Union[1, 2], value_or_length: int = 1, channel: int = 1,
+                              data_or_length: Union[1, bytearray] = 1) -> int:
         """
         Sends a control transfer to the current device.
         :param cmd: 1 for single value transfer, 2 for multi-value transfer
@@ -111,14 +114,14 @@ class uDMXDevice:
         """
 
         n = self._dev.ctrl_transfer(bmRequestType, cmd, wValue=value_or_length, wIndex=channel - 1,
-            data_or_wLength=data_or_length)
+                                    data_or_wLength=data_or_length)
 
         # For a single value transfer the return value is the data_or_length value.
         # For a multi-value transfer the return value is the number of values transfer
         # which should be the number of values in the data_or_length bytearray.
         return n
 
-    def send_single_value(self, channel, value):
+    def send_single_value(self, channel: int, value: int) -> int:
         """
         Send a single value to the uDMX
         :param channel: DMX channel number, 1-512
@@ -129,7 +132,7 @@ class uDMXDevice:
         n = self._send_control_message(SetSingleChannel, value_or_length=value, channel=channel, data_or_length=1)
         return n
 
-    def send_multi_value(self, channel, values):
+    def send_multi_value(self, channel: int, values: Union[List[int], bytearray]) -> int:
         """
         Send multiple consecutive bytes to the uDMX
         :param channel: The starting DMX channel number, 1-512
@@ -143,5 +146,5 @@ class uDMXDevice:
         else:
             ba = bytearray(values)
         n = self._send_control_message(SetMultiChannel, value_or_length=len(ba),
-            channel=channel, data_or_length=ba)
+                                       channel=channel, data_or_length=ba)
         return n
