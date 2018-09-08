@@ -26,6 +26,7 @@ The full source is maintained on [GitHub](https://www.github.com/dhocker/uDMX-py
 ### Virtual Environment
 
 This work was originally written in Python 2.7 but has been adapted for both Python 2 and Python 3.
+Version 1.1.0 works on Python 2. Version 2.0.0 and above works on Python 3.5+.
 A suitable development environment would use virtualenv and virtualenvwrapper to create a working virtual environment.
 The **requirements.txt** file can be used with pip to create the required virtual environment with all dependencies.
 
