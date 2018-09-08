@@ -77,8 +77,8 @@ class uDMXDevice:
             usb.util.dispose_resources(self._dev)
             self._dev = None
 
-    def _send_control_message(self, cmd: Union[1, 2], value_or_length: int = 1, channel: int = 1,
-                              data_or_length: Union[1, bytearray] = 1) -> int:
+    def _send_control_message(self, cmd: int, value_or_length: int = 1, channel: int = 1,
+                              data_or_length: Union[int, bytearray] = 1) -> int:
         """
         Sends a control transfer to the current device.
         :param cmd: 1 for single value transfer, 2 for multi-value transfer
