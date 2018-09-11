@@ -22,11 +22,26 @@ Free Software Foundation, Inc.. See the LICENSE file for the full text of the li
 
 The full source is maintained on [GitHub](https://www.github.com/dhocker/uDMX-pyusb).
 
+## PyPI Packages
+One of the by-products of my research was a package for controlling a uDMX interface.
+While the source for this package can be found on GitHub, installable packages can
+be found on PyPI. Notes for using this can be found [below](#pyudmx.py-module).
+
+For Python 2/3 compatibility
+```
+pip install 'udmx-pyusb==1.1.1'
+```
+For Python 3.5+ compatibility
+```
+pip install udmx-pyusb
+```
+
 ## Development Environment
 ### Virtual Environment
 
 This work was originally written in Python 2.7 but has been adapted for both Python 2 and Python 3.
-Version 1.1.0 works on Python 2. Version 2.0.0 and above works on Python 3.5+.
+Version 1.1.1 works on Python 2 (any version 1.x.x will work on Python 2 and Python < 3.5). 
+Version 2.0.0 and above works on Python 3.5+.
 A suitable development environment would use virtualenv and virtualenvwrapper to create a working virtual environment.
 The **requirements.txt** file can be used with pip to create the required virtual environment with all dependencies.
 
