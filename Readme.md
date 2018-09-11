@@ -25,7 +25,7 @@ The full source is maintained on [GitHub](https://www.github.com/dhocker/uDMX-py
 ## PyPI Packages
 One of the by-products of my research was a package for controlling a uDMX interface.
 While the source for this package can be found on GitHub, installable packages can
-be found on PyPI. Notes for using this can be found [below](#pyudmx.py-module).
+be found on PyPI. Notes for using this can be found [below](#pyudmxpy-module).
 
 For Python 2/3 compatibility
 ```
