@@ -33,16 +33,21 @@ def read(*paths):
 
 
 setup(
-    name='pyudmx',
+    name='udmx-pyusb',
     version='2.0.0',
     description='uDMX Interface Library',
     long_description=(read('Readme.md')),
-    url='www.github.com/dhocker/udmx-pyusb',
+    long_description_content_type="text/markdown",
+    url='https://www.github.com/dhocker/udmx-pyusb',
     license='GPLv3. See LICENSE file.',
     author='Dave Hocker',
     author_email='AtHomeX10@gmail.com',
     py_modules=[],
     include_package_data=True,
     packages=find_packages(exclude=['tests*']),
-    install_requires=['pyusb']
+    install_requires=['pyusb>=1.0.2'],
+    classifiers = [
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent"
+    ]
 )
