@@ -51,6 +51,32 @@ case you are looking for a uDMX type of interface.
 import usb  # This is pyusb
 import time
 
+def ctrl_transfer(dev, bmRequestType, channelMode, wValue=0, wIndex=0, data_or_wLength=1):
+    """
+    Send control transfer with retry
+    Retrying would probably not be necessary if we were sending whole 512 byte blocks.
+    But, overflow errors seem to occur randomly when sending partial blocks.
+    :param dev: 
+    :param bmRequestType: 
+    :param channelMode: 
+    :param wValue: 
+    :param wIndex: 
+    :param data_or_wLength:
+    :return: 
+    """
+    retry = 5
+    n = 0
+    while retry:
+        try:
+            n = dev.ctrl_transfer(bmRequestType, channelMode, wValue=wValue,
+                                  wIndex=wIndex, data_or_wLength=data_or_wLength)
+            return n
+        except Exception as ex:
+            print(ex)
+            if retry <= 0:
+                return 0
+            retry -= 1
+
 # DEVICE ID 16c0:05dc
 # USB id's for uDMX (aka Anyma uDMX)
 # The attached DMX device was a Venue ThinPar64.
@@ -125,7 +151,7 @@ usb request for cmd_SetSingleChannel:
 	bRequest:		cmd_SetSingleChannel
 	wValue:			value of channel to set [0 .. 255]
 	wIndex:			channel index to set [0 .. 511]
-	wLength:		ignored
+	wLength:		ignored (pass 1)
 """
 cmd_SetChannelRange = 2
 """
@@ -164,6 +190,7 @@ usb request for cmd_SetChannelRange:
 # All data tranfers use this request type. This is more for
 # the PyUSB package than for the uDMX.
 bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb.util.CTRL_OUT
+# bmRequestType = usb.util.CTRL_RECIPIENT_DEVICE | usb.util.CTRL_OUT
 
 # Single channel value transfer
 # Interface for setting a single channel data value
@@ -172,30 +199,36 @@ bmRequestType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb
 # data_or_wLength - not used for this case. However, on success this will be the return value.
 
 # Set RGB mode (Venue ThinPar64 is in 7-channel mode)
-channel = 6  # mode channel
-channel_value = 255  # on all the way
-n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
+channel = 5  # mode channel 6
+channel_value = 0  # RGB mode
+n = ctrl_transfer(dev, bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
 print("Sent:", n)
 
 # Bring dimmer to 100%
-channel = 7  # dimmer channel
+channel = 6  # dimmer channel 7
 channel_value = 255  # on all the way
-n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
+n = ctrl_transfer(dev, bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
 print("Sent:", n)
 
 # Turn light on
 channel = 2  # blue channel
 channel_value = 255  # on all the way
-n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
+n = ctrl_transfer(dev, bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
 print("Sent:", n)
+channel = 0  # red channel
+channel_value = 255  # on all the way
+n = ctrl_transfer(dev, bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
+print("Sent:", n)
+print("Red/Blue")
 
 print("Sleeping...")
 time.sleep(3.000)
 
-# Turn light off
+# Turn red off
 channel_value = 0
-n = dev.ctrl_transfer(bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
+n = ctrl_transfer(dev, bmRequestType, cmd_SetSingleChannel, wValue=channel_value, wIndex=channel, data_or_wLength=1)
 print("Sent:", n)
+print("Blue")
 
 print("Sleeping...")
 time.sleep(2.000)
@@ -205,18 +238,22 @@ time.sleep(2.000)
 # wIndex - starting channel number, 0-511.
 # data_or_wLength - sequence type of data, e.g. a bytearray
 
-channel_values = bytearray([255, 255, 255])  # RGB all on
-channel = 0  # Red channel
+channel_values = [255, 255, 255]  # RGB all on
+channel = 0  # Red channel 1
 # Turn on red, green and blue lights
-n = dev.ctrl_transfer(bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
+n = ctrl_transfer(dev, bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
                       wIndex=channel, data_or_wLength=channel_values)
 print("Sent:", n)
+print("White")
 
 print("Sleeping...")
 time.sleep(3.000)
 
-channel_values = bytearray([0, 0, 0])  # all off
+channel_values = [0, 0, 0]  # all off
 # Turn off red, green and blue
-n = dev.ctrl_transfer(bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
+n = ctrl_transfer(dev, bmRequestType, cmd_SetChannelRange, wValue=len(channel_values), \
                       wIndex=channel, data_or_wLength=channel_values)
 print("Sent:", n)
+print("All off")
+del dev
+dev = None
